@@ -8,13 +8,13 @@
 <style>
 :root{--ivory:#fbf8f3;--cream:#f5efe7;--rose:#ead6d5;--sage:#879b88;--sage2:#6f856f;--gold:#b89a5b;--ink:#403c38;--muted:#7b746d;--white:#fffdf9;--line:#e7ddd2;--shadow:0 12px 35px rgba(72,58,45,.08)}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fbf8f3,#f7f1ea);color:var(--ink);font:15px/1.6 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:1080px;margin:auto;padding:22px 16px 60px}.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}.pill{border:1px solid var(--line);background:var(--white);border-radius:999px;padding:8px 13px;color:var(--muted);font-size:12px}.brand{text-align:center;padding:28px 12px 22px}.brand h1{font-family:Georgia,serif;letter-spacing:.18em;color:#a98543;font-size:clamp(34px,7vw,64px);margin:0;text-shadow:0 1px 12px rgba(184,154,91,.18)}.brand h2{font-family:Georgia,serif;font-weight:500;font-size:clamp(20px,3vw,30px);margin:8px 0;color:#51483f}.brand p{margin:5px 0;color:#806f5f;letter-spacing:.05em}.goldline{width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:14px auto}.hero{background:var(--white);border:1px solid var(--rose);border-radius:30px;padding:25px;box-shadow:var(--shadow);margin-bottom:18px}.hero h3,.card h3{font-family:Georgia,serif;margin:0 0 8px}.subtle{color:var(--muted);font-size:13px}.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}.chip,.btn{border:1px solid var(--line);background:#fffaf5;border-radius:14px;padding:10px 12px;color:var(--ink)}.chip.active,.btn.primary{background:#efe1c5;border-color:#d9bd83}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}.card.wide{grid-column:1/-1}.quote{font-family:Georgia,serif;font-style:italic;font-size:16px}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.hidden{display:none!important}.verse{background:#faf5ec;border-left:3px solid var(--gold);padding:13px;border-radius:12px;margin-top:12px}.timer{font-family:Georgia,serif;font-size:38px;text-align:center;margin:8px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;background:#fffefa;padding:10px;color:var(--ink)}textarea{min-height:130px;resize:vertical}.list{padding-left:20px}.bookgrid{display:grid;grid-template-columns:repeat(11,1fr);gap:5px}.book{font-size:10px;padding:7px 2px;border:1px solid var(--line);border-radius:8px;background:#fff}.book.read{background:var(--sage);color:white;border-color:var(--sage)}footer{text-align:center;color:#958a80;margin-top:28px;font-size:12px}@media(max-width:720px){.grid{grid-template-columns:1fr}.chips{grid-template-columns:repeat(2,1fr)}.bookgrid{grid-template-columns:repeat(6,1fr)}}.night{background:#242522;color:#eee}.night .card,.night .hero,.night .pill,.night input,.night textarea,.night select{background:#30322d;color:#eee;border-color:#555}.night .subtle, .night footer{color:#bbb}.night .verse{background:#3a382f}
-.history-results{margin-top:14px;display:grid;gap:10px}.history-item{padding:13px;border:1px solid var(--line);border-radius:14px;background:#fffaf5}.history-item small{color:var(--muted)}.history-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.prayer-entry{border:1px solid var(--line);border-radius:16px;padding:15px;margin-top:12px}.answered{background:#edf4ed}.date-badge{font-size:12px;color:var(--muted)}.sabbath-only{display:none}.sabbath-active .sabbath-only{display:block}</style>
+.quicknav{position:sticky;top:8px;z-index:10;display:flex;gap:8px;overflow-x:auto;padding:7px 2px;margin:0 0 14px;scrollbar-width:none}.quicknav a{white-space:nowrap;text-decoration:none;color:var(--ink);background:rgba(255,253,249,.94);border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:12px;box-shadow:0 4px 14px rgba(72,58,45,.05)}.soul-moment{border-color:#dcc6a1}.quicknav::-webkit-scrollbar{display:none}.history-results{margin-top:14px;display:grid;gap:10px}.history-item{padding:13px;border:1px solid var(--line);border-radius:14px;background:#fffaf5}.history-item small{color:var(--muted)}.history-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.prayer-entry{border:1px solid var(--line);border-radius:16px;padding:15px;margin-top:12px}.answered{background:#edf4ed}.date-badge{font-size:12px;color:var(--muted)}.sabbath-only{display:none}.sabbath-active .sabbath-only{display:block}</style>
 </head>
 <body id="app">
 <div class="app">
 <div class="topbar"><button class="pill" id="quietBtn">🌙 Midnight Sanctuary</button><button class="pill" id="sabbathBtn">Sabbath Shift: OFF</button></div>
 
-<header class="brand">
+<nav class="quicknav" aria-label="Sanctuary navigation"><a href="#inner-room">Coffee & Grace</a><a href="#sos-card">Be Still</a><a href="#scripture-card">Scripture</a><a href="#journal-card">Journal</a><a href="#rhythm-card">Daily Rhythm</a><a href="#my-days">My Days</a></nav>\n\n<section class="hero soul-moment" id="soul-moment"><div class="subtle">A quiet welcome for today</div><h3>A Moment for Your Soul</h3><p class="quote" id="soulMessage"></p><p class="subtle">You do not have to arrive polished. Just arrive.</p></section>\n\n<header class="brand">
 <h1>AVONIRE</h1><div class="goldline"></div>
 <h2>Coffee Time with Jesus</h2>
 <p>A Private Sanctuary for Busy Women’s Souls</p>
@@ -43,7 +43,7 @@
 
 <section class="card"><h3>“BE STILL” Prayer Anchor</h3><p class="subtle">Slow down, breathe, and find center grounding.</p><div class="timer" id="timer">02:00</div><div class="actions"><button class="btn" data-min="2">2 Min</button><button class="btn" data-min="5">5 Min</button><button class="btn" data-min="10">10 Min</button><button class="btn primary" id="timerBtn">START</button><button class="btn" id="timerReset">RESET</button></div></section>
 
-<section class="card wide"><h3>📖 Scripture Daily Bread</h3><div class="row"><select id="book"><option>Genesis</option><option>Psalms</option><option>Proverbs</option><option>Philippians</option><option>John</option></select><select id="chapter"><option>1</option><option>2</option><option>3</option><option>4</option></select></div><div class="verse"><p id="scriptureText">“Be careful for nothing; but in everything by prayer and supplication with thanksgiving let your requests be made known unto God.”</p><strong id="scriptureCitation">— Philippians 4:6</strong></div><div class="actions"><button class="btn" id="listenScripture">🔊 Listen</button><button class="btn" id="bookmark">♡ Bookmark</button><button class="btn" id="stopAudio">Stop</button></div></section>
+<section class="card wide" id="scripture-card"><h3>📖 Scripture Daily Bread</h3><div class="row"><select id="book"><option>Genesis</option><option>Psalms</option><option>Proverbs</option><option>Philippians</option><option>John</option></select><select id="chapter"><option>1</option><option>2</option><option>3</option><option>4</option></select></div><div class="verse"><p id="scriptureText">“Be careful for nothing; but in everything by prayer and supplication with thanksgiving let your requests be made known unto God.”</p><strong id="scriptureCitation">— Philippians 4:6</strong></div><div class="actions"><button class="btn" id="listenScripture">🔊 Listen</button><button class="btn" id="bookmark">♡ Bookmark</button><button class="btn" id="stopAudio">Stop</button></div></section>
 
 <section class="card wide"><h3>♡ My Bookmarked Favorites Chest</h3><ul class="list" id="favorites"><li>No favorites bookmarked inside your local chest yet.</li></ul></section>
 
@@ -53,11 +53,11 @@
 
 <section class="card" id="matrix-card"><h3>🧺 Martha & Mary To-Do Matrix</h3><div class="row"><div><strong>Martha — Hand Chores</strong><input id="marthaIn" placeholder="Add a task"><button class="btn" id="addMartha">+</button><ul class="list" id="marthaList"></ul></div><div><strong>Mary — Soul Care</strong><input id="maryIn" placeholder="Add soul-care task"><button class="btn" id="addMary">+</button><ul class="list" id="maryList"></ul></div></div><button class="btn" id="graceReset">Grace Reset</button></section>
 
-<section class="card"><h3>📓 Private Journal</h3><p class="subtle">Text notes save locally on this device.</p><textarea id="journal" placeholder="Write what is on your heart…"></textarea><div class="actions"><button class="btn" id="saveJournal">Save Locally</button><button class="btn" id="readJournal">Read Aloud</button><button class="btn" id="exportJournal">Export .txt</button></div></section>
+<section class="card" id="journal-card"><h3>📓 Private Journal</h3><p class="subtle">Text notes save locally on this device.</p><textarea id="journal" placeholder="Write what is on your heart…"></textarea><div class="actions"><button class="btn" id="saveJournal">Save Locally</button><button class="btn" id="readJournal">Read Aloud</button><button class="btn" id="exportJournal">Export .txt</button></div></section>
 
 <section class="card"><h3>🌸 Three-Blessing Gratitude Jar</h3><input id="blessing" placeholder="One blessing"><button class="btn" id="addBlessing">Seal Blessing in Jar</button><ul class="list" id="blessings"></ul></section>
 
-<section class="card"><h3>🕰 Daily Pacing Routine Planner</h3><div class="row"><input id="morning" placeholder="Morning"><input id="midday" placeholder="Midday"><input id="evening" placeholder="Evening"></div><button class="btn" id="savePlanner">Commit Schedule Plan</button></section>
+<section class="card" id="rhythm-card"><h3>🕰 Daily Rhythm Planner</h3><p class="subtle">A kinder pace. Make space for life as it is, not as it should be.</p><div class="row"><input id="morning" placeholder="Morning — gentle intention"><input id="midday" placeholder="Midday — a pause to return to"><input id="evening" placeholder="Evening — a way to wind down"></div><button class="btn" id="savePlanner">Commit Schedule Plan</button></section>
 
 <section class="card"><h3>💰 Family Bills & Expense Log</h3><div class="row"><input id="expenseName" placeholder="Bill / expense"><input id="expenseCost" type="number" step="0.01" placeholder="Amount"></div><button class="btn" id="addExpense">Log Expense</button><ul class="list" id="expenses"></ul></section>
 
@@ -184,5 +184,70 @@ $('importDataBtn').onclick=()=>$('importData').click();$('importData').onchange=
 renderHistory();
 })();
 </script>
-</body>
+<script>
+(function(){
+const momentMessages=[
+'This is a quiet corner for prayer, small joys, and the beautifully unfinished parts of today.',
+'You do not have to solve the whole day before breakfast. Take this moment, then the next.',
+'Let today be gentle. God is not asking you to become someone else before you can come close.',
+'There is room here for your questions, your gratitude, your weariness, and your hope.',
+'Before the day asks anything from you, remember: you are already loved.',
+'Small moments with God still count. A whispered prayer is still a prayer.',
+'You can begin again without making a speech about yesterday.',
+'Today does not need to be perfect to be meaningful.',
+'Take a breath. You are allowed to move through this day at a human pace.',
+'Bring your real life into this quiet corner. That is exactly what it is for.'
+];
+const dayIndex=Math.floor(Date.now()/86400000)%momentMessages.length;
+$('soulMessage').textContent=momentMessages[dayIndex];
+
+const laughs=[
+'My house is clean, my children are quiet, laundry is completely folded away, and dinner is perfectly cooked… then I woke up from my afternoon nap.',
+'I organized the house today. Everything is now in a different place, so technically I created a scavenger hunt.',
+'I told myself I would sit down for five minutes. My children interpreted that as a family meeting.',
+'Coffee: because sometimes the fruit of the Spirit needs a little help getting started.',
+'Today I planned to get everything done. Then real life showed up and asked for coffee.'
+];
+let li=0;
+const lb=document.getElementById('laughBox');
+const laughBtn=document.getElementById('laughBtn');
+if(laughBtn){laughBtn.textContent='☕ Next Laugh';laughBtn.onclick=()=>{li=(li+1)%laughs.length;lb.classList.remove('hidden');lb.textContent=laughs[li]};}
+
+const peace=[
+['John 14:27','Peace I leave with you, my peace I give you. Let not your heart be troubled, neither let it be afraid.'],
+['Psalm 46:10','Be still, and know that I am God.'],
+['Isaiah 26:3','Thou wilt keep him in perfect peace, whose mind is stayed on thee.'],
+['Philippians 4:6-7','Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.'],
+['Psalm 4:8','I will both lay me down in peace, and sleep: for thou, Lord, only makest me dwell in safety.'],
+['Matthew 11:28','Come unto me, all ye that labour and are heavy laden, and I will give you rest.']
+];
+let pi=0,sosTimer=null,sosSeconds=60;
+const sosBox=$('sosBox'),sosBtn=$('sosBtn');
+if(sosBox&&sosBtn){
+ sosBox.innerHTML='<div id="sosPhase" style="font-family:Georgia,serif;font-size:20px">BREATHE IN</div><div id="sosCount" class="timer" style="font-size:28px">01:00</div><p id="sosVerse"></p><strong id="sosRef"></strong><div class="actions"><button class="btn" id="nextPeace">Next Peace Scripture</button><button class="btn" id="stopSos">Stop</button></div>';
+ const renderPeace=()=>{$('sosVerse').textContent='“'+peace[pi][1]+'”';$('sosRef').textContent='— '+peace[pi][0]};
+ renderPeace();
+ $('nextPeace').onclick=()=>{pi=(pi+1)%peace.length;renderPeace()};
+ sosBtn.onclick=()=>{sosBox.classList.remove('hidden');clearInterval(sosTimer);sosSeconds=60;const phases=['BREATHE IN','HOLD','BREATHE OUT'];let p=0;$('sosPhase').textContent=phases[p];$('sosCount').textContent='01:00';sosTimer=setInterval(()=>{sosSeconds--;p=(p+1)%phases.length;$('sosPhase').textContent=phases[p];$('sosCount').textContent=String(Math.floor(Math.max(0,sosSeconds)/60)).padStart(2,'0')+':'+String(Math.max(0,sosSeconds)%60).padStart(2,'0');if(sosSeconds<=0){clearInterval(sosTimer);$('sosPhase').textContent='REST IN PEACE';}},1000)};
+ $('stopSos').onclick=()=>{clearInterval(sosTimer);sosBox.classList.add('hidden')};
+}
+
+const still=document.querySelector('#timer')?.parentElement;
+if(still && !document.getElementById('stillCue')){const cue=document.createElement('div');cue.id='stillCue';cue.className='verse';cue.innerHTML='<strong>Breathe with the prayer.</strong><div id="stillPhase">Breathe in slowly.</div>';still.insertBefore(cue,still.querySelector('.actions'));let phase=0;setInterval(()=>{const phases=['Breathe in slowly.','Hold gently.','Breathe out slowly.','Rest in the quiet.'];phase=(phase+1)%phases.length;const el=$('stillPhase');if(el)el.textContent=phases[phase]},4000)}
+
+const anchorMore=[
+['You are not behind. You are living a life that requires patience, courage, and grace.','— Psalm 37:23'],
+['God can meet you in ten quiet seconds just as surely as in an hour of study.','— Psalm 62:5'],
+['Your next faithful step can be small. Small does not mean insignificant.','— Zechariah 4:10'],
+['You are allowed to rest before everything is finished.','— Mark 6:31'],
+['Grace is not a reward for having a perfect day. It is help for the day you actually have.','— Hebrews 4:16'],
+['Let today hold both responsibility and joy. You do not have to choose only one.','— Ecclesiastes 3:13']
+];
+let ai=0;const nq=$('nextQuote');if(nq){nq.onclick=()=>{ai=(ai+1)%anchorMore.length;$('anchorQuote').textContent='“'+anchorMore[ai][0]+'”';$('anchorVerse').textContent=anchorMore[ai][1]};}
+
+const oldSabbathHandler=$('sabbathBtn')?.onclick;
+if(oldSabbathHandler){$('sabbathBtn').onclick=()=>{oldSabbathHandler();const active=$('sabbathBtn').dataset.on==='1';document.body.classList.toggle('sabbath-active',active);const inputs=document.querySelectorAll('#marthaIn,#addMartha');inputs.forEach(x=>{x.disabled=active;x.title=active?'Martha is resting for Sabbath.':''});const ml=$('marthaList');if(active&&ml){ml.setAttribute('aria-label','Martha chores are paused during Sabbath Rest Mode.')}}}
+
+})();
+</script>\n</body>
 </html>
