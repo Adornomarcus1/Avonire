@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noai,noimageai,noindex,nofollow">
+<title>AVONIRE — Coffee Time with Jesus</title>
+<style>
+:root{--ivory:#fbf8f3;--cream:#f5efe7;--rose:#ead6d5;--sage:#879b88;--sage2:#6f856f;--gold:#b89a5b;--ink:#403c38;--muted:#7b746d;--white:#fffdf9;--line:#e7ddd2;--shadow:0 12px 35px rgba(72,58,45,.08)}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fbf8f3,#f7f1ea);color:var(--ink);font:15px/1.6 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.app{max-width:1080px;margin:auto;padding:22px 16px 60px}.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}.pill{border:1px solid var(--line);background:var(--white);border-radius:999px;padding:8px 13px;color:var(--muted);font-size:12px}.brand{text-align:center;padding:28px 12px 22px}.brand h1{font-family:Georgia,serif;letter-spacing:.18em;color:#a98543;font-size:clamp(34px,7vw,64px);margin:0;text-shadow:0 1px 12px rgba(184,154,91,.18)}.brand h2{font-family:Georgia,serif;font-weight:500;font-size:clamp(20px,3vw,30px);margin:8px 0;color:#51483f}.brand p{margin:5px 0;color:#806f5f;letter-spacing:.05em}.goldline{width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:14px auto}.hero{background:var(--white);border:1px solid var(--rose);border-radius:30px;padding:25px;box-shadow:var(--shadow);margin-bottom:18px}.hero h3,.card h3{font-family:Georgia,serif;margin:0 0 8px}.subtle{color:var(--muted);font-size:13px}.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}.chip,.btn{border:1px solid var(--line);background:#fffaf5;border-radius:14px;padding:10px 12px;color:var(--ink)}.chip.active,.btn.primary{background:#efe1c5;border-color:#d9bd83}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}.card.wide{grid-column:1/-1}.quote{font-family:Georgia,serif;font-style:italic;font-size:16px}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.hidden{display:none!important}.verse{background:#faf5ec;border-left:3px solid var(--gold);padding:13px;border-radius:12px;margin-top:12px}.timer{font-family:Georgia,serif;font-size:38px;text-align:center;margin:8px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;background:#fffefa;padding:10px;color:var(--ink)}textarea{min-height:130px;resize:vertical}.list{padding-left:20px}.bookgrid{display:grid;grid-template-columns:repeat(11,1fr);gap:5px}.book{font-size:10px;padding:7px 2px;border:1px solid var(--line);border-radius:8px;background:#fff}.book.read{background:var(--sage);color:white;border-color:var(--sage)}footer{text-align:center;color:#958a80;margin-top:28px;font-size:12px}@media(max-width:720px){.grid{grid-template-columns:1fr}.chips{grid-template-columns:repeat(2,1fr)}.bookgrid{grid-template-columns:repeat(6,1fr)}}.night{background:#242522;color:#eee}.night .card,.night .hero,.night .pill,.night input,.night textarea,.night select{background:#30322d;color:#eee;border-color:#555}.night .subtle, .night footer{color:#bbb}.night .verse{background:#3a382f}
+</style>
+</head>
+<body id="app">
+<div class="app">
+<div class="topbar"><button class="pill" id="quietBtn">🌙 Midnight Sanctuary</button><button class="pill" id="sabbathBtn">Sabbath Shift: OFF</button></div>
+
+<header class="brand">
+<h1>AVONIRE</h1><div class="goldline"></div>
+<h2>Coffee Time with Jesus</h2>
+<p>A Private Sanctuary for Busy Women’s Souls</p>
+<p class="subtle">Come as you are.</p>
+</header>
+
+<section class="hero" id="inner-room">
+<h3>☕ Coffee Time with Jesus — Inner Room</h3>
+<p class="subtle">When you are ready—or need a reminder of your true value, role, and native strength—sit at the table and tap how your soul feels.</p>
+<div class="chips">
+<button class="chip" data-feeling="overwhelmed">Overwhelmed</button>
+<button class="chip" data-feeling="mother">Mother Guilt</button>
+<button class="chip" data-feeling="crossroads">Scary Crossroads</button>
+<button class="chip" data-feeling="pain">Unanswered Pain</button>
+</div>
+<div id="feelingResponse" class="verse hidden"><strong id="feelingVerse"></strong><br><span id="feelingReminder"></span></div>
+<div class="actions"><button class="btn" id="speakFeeling">🔊 Listen to Audio</button></div>
+</section>
+
+<div class="grid">
+<section class="card" id="sos-card"><h3>🕊 SOS Peace</h3><p class="subtle">Chaotic moment? Tap for a one-minute scriptural anchor.</p><button class="btn primary" id="sosBtn">SOS PEACE</button><div id="sosBox" class="verse hidden"><div>BREATHE IN… BREATHE OUT…</div><p>“Peace I leave with you, my peace I give unto you. Let not your heart be troubled, neither let it be afraid.”</p><strong>— John 14:27</strong></div></section>
+
+<section class="card" id="anchor-card"><h3>Daily Anchor Focus</h3><p class="quote" id="anchorQuote">“Your worth is not measured by the empty bottom of a laundry basket or a flawless schedule. God met you in the mess, and His grace is sufficient for this hour.”</p><p class="subtle" id="anchorVerse">— Matthew 11:28</p><div class="actions"><button class="btn" id="nextQuote">✨ Next Grace Quote</button><button class="btn" id="laughBtn">☕ Laughter & Grace</button></div><div id="laughBox" class="verse hidden">“My house is clean, my children are quiet, laundry is completely folded away, and dinner is perfectly cooked… then I woke up from my afternoon nap.”</div></section>
+
+<section class="card"><h3>🧺 The Basket of Crumbs</h3><p class="subtle">30-second fast prayers for full hands and busy moments.</p><p class="quote" id="crumb">“Lord, my hands are full with the kids right now, but my heart is open to You. Give me an extra measure of patience for the next hour.”</p><button class="btn" id="nextCrumb">Next Crumb</button></section>
+
+<section class="card"><h3>“BE STILL” Prayer Anchor</h3><p class="subtle">Slow down, breathe, and find center grounding.</p><div class="timer" id="timer">02:00</div><div class="actions"><button class="btn" data-min="2">2 Min</button><button class="btn" data-min="5">5 Min</button><button class="btn" data-min="10">10 Min</button><button class="btn primary" id="timerBtn">START</button><button class="btn" id="timerReset">RESET</button></div></section>
+
+<section class="card wide"><h3>📖 Scripture Daily Bread</h3><div class="row"><select id="book"><option>Genesis</option><option>Psalms</option><option>Proverbs</option><option>Philippians</option><option>John</option></select><select id="chapter"><option>1</option><option>2</option><option>3</option><option>4</option></select></div><div class="verse"><p id="scriptureText">“Be careful for nothing; but in everything by prayer and supplication with thanksgiving let your requests be made known unto God.”</p><strong id="scriptureCitation">— Philippians 4:6</strong></div><div class="actions"><button class="btn" id="listenScripture">🔊 Listen</button><button class="btn" id="bookmark">♡ Bookmark</button><button class="btn" id="stopAudio">Stop</button></div></section>
+
+<section class="card wide"><h3>♡ My Bookmarked Favorites Chest</h3><ul class="list" id="favorites"><li>No favorites bookmarked inside your local chest yet.</li></ul></section>
+
+<section class="card wide" id="fasting-card"><h3>🌿 Spiritual Wilderness — Fasting Portal</h3><p class="subtle">Choose a focus and keep your notes locally on this device.</p><div class="actions"><button class="chip fastIntent" data-intent="family">Family</button><button class="chip fastIntent" data-intent="clarity">Clarity</button><button class="chip fastIntent" data-intent="healing">Healing</button><button class="chip fastIntent" data-intent="breakthrough">Breakthrough</button></div><div class="verse" id="fastVerse">Select an intention to load a related scripture.</div><div class="actions"><button class="chip fastType active" data-type="water">Water</button><button class="chip fastType" data-type="daniel">Daniel</button><button class="chip fastType" data-type="intermittent">Intermittent</button><button class="chip fastType" data-type="digital">Digital</button></div><p id="fastGuide" class="subtle">Water Only Mode: use this as a spiritual reflection area and maintain safe hydration.</p><div class="row"><input id="foodInput" placeholder="Food or liquid taken today"><button class="btn" id="addFood">Log Item</button></div><ul class="list" id="foodList"></ul><div class="actions"><button class="btn" id="dictate">🎙 Speak Prayer / Fast Thought Aloud</button></div></section>
+
+<section class="card"><h3>🗣 Spoken Voice Prayer Sandbox</h3><p class="subtle">Use your device’s native speech tools when available.</p><textarea id="voicePrayer" placeholder="Your prayer or thought…"></textarea><div class="actions"><button class="btn" id="speakPrayer">Read Text-to-Audio</button><button class="btn" id="savePrayer">Save Locally</button></div></section>
+
+<section class="card" id="matrix-card"><h3>🧺 Martha & Mary To-Do Matrix</h3><div class="row"><div><strong>Martha — Hand Chores</strong><input id="marthaIn" placeholder="Add a task"><button class="btn" id="addMartha">+</button><ul class="list" id="marthaList"></ul></div><div><strong>Mary — Soul Care</strong><input id="maryIn" placeholder="Add soul-care task"><button class="btn" id="addMary">+</button><ul class="list" id="maryList"></ul></div></div><button class="btn" id="graceReset">Grace Reset</button></section>
+
+<section class="card"><h3>📓 Private Journal</h3><p class="subtle">Text notes save locally on this device.</p><textarea id="journal" placeholder="Write what is on your heart…"></textarea><div class="actions"><button class="btn" id="saveJournal">Save Locally</button><button class="btn" id="readJournal">Read Aloud</button><button class="btn" id="exportJournal">Export .txt</button></div></section>
+
+<section class="card"><h3>🌸 Three-Blessing Gratitude Jar</h3><input id="blessing" placeholder="One blessing"><button class="btn" id="addBlessing">Seal Blessing in Jar</button><ul class="list" id="blessings"></ul></section>
+
+<section class="card"><h3>🕰 Daily Pacing Routine Planner</h3><div class="row"><input id="morning" placeholder="Morning"><input id="midday" placeholder="Midday"><input id="evening" placeholder="Evening"></div><button class="btn" id="savePlanner">Commit Schedule Plan</button></section>
+
+<section class="card"><h3>💰 Family Bills & Expense Log</h3><div class="row"><input id="expenseName" placeholder="Bill / expense"><input id="expenseCost" type="number" step="0.01" placeholder="Amount"></div><button class="btn" id="addExpense">Log Expense</button><ul class="list" id="expenses"></ul></section>
+
+<section class="card wide"><h3>📚 66-Book Journey Map Tracker</h3><p class="subtle" id="progress">0/66 Completed</p><div class="bookgrid" id="books"></div><h3 style="margin-top:18px">My Read Books Library Shelf</h3><p class="subtle" id="shelf">Your library shelf is empty. Mark a book below to place it here.</p></section>
+
+<section class="card wide"><h3>🔐 App Monitor & Subscription Registry</h3><p class="subtle">Keep a private, on-device reminder of app subscriptions. Do not enter full card numbers or passwords.</p><div class="row"><input id="subName" placeholder="Subscription name"><input id="subRenew" placeholder="Renewal date"></div><button class="btn" id="addSub">Lock Subscription Reminder</button><ul class="list" id="subs"></ul></section>
+</div>
+<footer>AVONIRE • Coffee Time with Jesus • Private sanctuary • Local device storage</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const speak=text=>{if(!('speechSynthesis'in window))return; speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.86;speechSynthesis.speak(u)};
+
+const feelings={
+overwhelmed:['“Come unto me, all ye that labour and are heavy laden, and I will give you rest.” — Matthew 11:28','You do not have to carry this hour alone. Receive grace for the next small step.'],
+mother:['“He shall gently lead those that are with young.” — Isaiah 40:11','Being tired does not erase your love or your worth. Let grace meet you here.'],
+crossroads:['“Trust in the Lord with all thine heart…” — Proverbs 3:5-6','You can pause, pray, gather wisdom, and take one faithful step at a time.'],
+pain:['“I am a woman of a sorrowful spirit… but have poured out my soul before the Lord.” — 1 Samuel 1:15','Bring the unanswered place honestly to God. Your prayer can begin exactly where you are.']
+};
+document.querySelectorAll('[data-feeling]').forEach(b=>b.onclick=()=>{const x=feelings[b.dataset.feeling];$('feelingResponse').classList.remove('hidden');$('feelingVerse').textContent=x[0];$('feelingReminder').textContent=x[1];document.querySelectorAll('[data-feeling]').forEach(c=>c.classList.remove('active'));b.classList.add('active');$('speakFeeling').onclick=()=>speak(x[0]+' '+x[1])});
+
+$('sosBtn').onclick=()=>$('sosBox').classList.toggle('hidden');
+const quotes=[
+['“Your worth is not measured by the empty bottom of a laundry basket or a flawless schedule. God met you in the mess, and His grace is sufficient for this hour.”','— Matthew 11:28'],
+['“You are not failing because you are tired. You are a human being poured out for those you love. Let Him fill your cup before you pour out another drop.”','— Galatians 6:9'],
+['“The hands that hold the universe are the exact same hands holding your children, your marriage, and your tomorrow. Step back and breathe.”','— Philippians 4:6-7']];
+let qi=0;$('nextQuote').onclick=()=>{qi=(qi+1)%quotes.length;$('anchorQuote').textContent=quotes[qi][0];$('anchorVerse').textContent=quotes[qi][1]};$('laughBtn').onclick=()=>$('laughBox').classList.toggle('hidden');
+const crumbs=['“Lord, my hands are full with the kids right now, but my heart is open to You. Give me an extra measure of patience for the next hour.”','“Father, as I sit in this carpool line, I hand You my fatigue. Quiet the racing thoughts in my mind and ground me in Your peace.”','“Jesus, this work task feels dry. Remind me that I am working for Your kingdom, not for human validation.”'];let ci=0;$('nextCrumb').onclick=()=>{ci=(ci+1)%crumbs.length;$('crumb').textContent=crumbs[ci]};
+
+let seconds=120,timer=null;const renderTimer=()=>{$('timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0')};
+document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>{clearInterval(timer);seconds=+b.dataset.min*60;renderTimer();$('timerBtn').textContent='START'});$('timerBtn').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('timerBtn').textContent='RESUME'}else{timer=setInterval(()=>{if(seconds>0){seconds--;renderTimer()}else{clearInterval(timer);timer=null;$('timerBtn').textContent='FINISHED AMEN'}},1000);$('timerBtn').textContent='PAUSE'}};$('timerReset').onclick=()=>{clearInterval(timer);timer=null;seconds=120;renderTimer();$('timerBtn').textContent='START'};
+
+const scripture='“Be careful for nothing; but in everything by prayer and supplication with thanksgiving let your requests be made known unto God.”';$('listenScripture').onclick=()=>speak($('scriptureText').textContent+' '+$('scriptureCitation').textContent);$('stopAudio').onclick=()=>speechSynthesis?.cancel();
+let favs=load('av_favorites',[]);function renderFav(){ $('favorites').innerHTML=favs.length?favs.map(x=>'<li>'+x+'</li>').join(''):'<li>No favorites bookmarked inside your local chest yet.</li>'};$('bookmark').onclick=()=>{const x=$('scriptureCitation').textContent+': '+$('scriptureText').textContent;if(!favs.includes(x)){favs.push(x);save('av_favorites',favs);renderFav()}};renderFav();
+
+const intents={family:'“And all thy children shall be taught of the Lord; and great shall be the peace of thy children.” — Isaiah 54:13',clarity:'“Trust in the Lord with all thine heart; and lean not unto thine own understanding.” — Proverbs 3:5-6',healing:'“He healeth the broken in heart, and bindeth up their wounds.” — Psalm 147:3',breakthrough:'“Is not this the fast that I have chosen? to loose the bands of wickedness…” — Isaiah 58:6'};document.querySelectorAll('.fastIntent').forEach(b=>b.onclick=()=>{$('fastVerse').textContent=intents[b.dataset.intent]});
+const guides={water:'Water Only Mode: use this as a spiritual reflection area and maintain safe hydration.',daniel:'Daniel Fast reflection: focus on simple whole foods and prayerful intention.',intermittent:'Intermittent Fast reflection: use the fasting window for prayer and quiet.',digital:'Digital Fast: step away from recreational screens and make room for quiet.'};document.querySelectorAll('.fastType').forEach(b=>b.onclick=()=>{$('fastGuide').textContent=guides[b.dataset.type];document.querySelectorAll('.fastType').forEach(x=>x.classList.remove('active'));b.classList.add('active')});
+let foods=load('av_foods',[]);function renderFoods(){$('foodList').innerHTML=foods.map(x=>'<li>✓ '+x+'</li>').join('')};$('addFood').onclick=()=>{if($('foodInput').value.trim()){foods.push($('foodInput').value.trim());save('av_foods',foods);$('foodInput').value='';renderFoods()}};renderFoods();
+
+$('speakPrayer').onclick=()=>speak($('voicePrayer').value);$('savePrayer').onclick=()=>{localStorage.setItem('av_voice_prayer',$('voicePrayer').value);alert('Saved locally on this device.')};$('voicePrayer').value=localStorage.getItem('av_voice_prayer')||'';
+function addMatrix(type){const input=$(type+'In');if(!input.value.trim())return;const li=document.createElement('li');li.textContent=input.value.trim();$(type+'List').appendChild(li);input.value=''}$('addMartha').onclick=()=>addMatrix('martha');$('addMary').onclick=()=>addMatrix('mary');$('graceReset').onclick=()=>{$('marthaList').innerHTML='';$('maryList').innerHTML='';};
+$('saveJournal').onclick=()=>{localStorage.setItem('av_journal',$('journal').value);alert('Journal saved locally.')};$('journal').value=localStorage.getItem('av_journal')||'';$('readJournal').onclick=()=>speak($('journal').value);$('exportJournal').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('journal').value],{type:'text/plain'}));a.download='avonire-journal.txt';a.click()};
+let blessings=load('av_blessings',[]);function renderBlessings(){$('blessings').innerHTML=blessings.map(x=>'<li>'+x+'</li>').join('')};$('addBlessing').onclick=()=>{if($('blessing').value.trim()){blessings.push($('blessing').value.trim());save('av_blessings',blessings);$('blessing').value='';renderBlessings()}};renderBlessings();
+$('savePlanner').onclick=()=>{save('av_planner',{morning:$('morning').value,midday:$('midday').value,evening:$('evening').value});alert('Schedule saved locally.')};
+let expenses=load('av_expenses',[]);function renderExpenses(){$('expenses').innerHTML=expenses.map(x=>'<li>'+x.n+' — $'+x.c+'</li>').join('')};$('addExpense').onclick=()=>{if($('expenseName').value.trim()&&$('expenseCost').value){expenses.push({n:$('expenseName').value.trim(),c:$('expenseCost').value});save('av_expenses',expenses);$('expenseName').value='';$('expenseCost').value='';renderExpenses()}};renderExpenses();
+
+const books=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation'];let read=load('av_books',[]);function renderBooks(){ $('books').innerHTML=books.map(b=>'<button class="book '+(read.includes(b)?'read':'')+'" title="'+b+'">'+b+'</button>').join('');document.querySelectorAll('.book').forEach((b,i)=>b.onclick=()=>{const name=books[i];read=read.includes(name)?read.filter(x=>x!==name):[...read,name];save('av_books',read);renderBooks()});$('progress').textContent=read.length+'/66 Completed';$('shelf').textContent=read.length?read.join(' • '):'Your library shelf is empty. Mark a book below to place it here.'};renderBooks();
+
+let subs=load('av_subs',[]);function renderSubs(){$('subs').innerHTML=subs.map(x=>'<li>'+x.n+' — renewal '+x.r+'</li>').join('')};$('addSub').onclick=()=>{if($('subName').value.trim()){subs.push({n:$('subName').value.trim(),r:$('subRenew').value.trim()||'not set'});save('av_subs',subs);$('subName').value='';$('subRenew').value='';renderSubs()}};renderSubs();
+
+$('quietBtn').onclick=()=>document.body.classList.toggle('night');$('sabbathBtn').onclick=()=>{const on=$('sabbathBtn').dataset.on==='1';$('sabbathBtn').dataset.on=on?'0':'1';$('sabbathBtn').textContent=on?'Sabbath Shift: OFF':'Sabbath Rest Mode Active'};
+$('dictate').onclick=()=>{const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){alert('Voice dictation is not supported by this browser.');return}const r=new R();r.lang='en-US';r.onresult=e=>{$('voicePrayer').value+=' '+e.results[0][0].transcript};r.start()};
+</script>
+</body>
+</html>
