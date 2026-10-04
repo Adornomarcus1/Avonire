@@ -52,6 +52,7 @@
 <select id="book" aria-label="Bible book"></select>
 <select id="chapter" aria-label="Bible chapter"></select>
 </div>
+<div class="row" style="margin-top:8px"><select id="bibleVoice" aria-label="Bible reading voice"><option value="woman1">Woman 1 — Calm</option><option value="woman2">Woman 2 — Warm</option><option value="woman3">Woman 3 — Clear</option></select><button class="btn" id="previewBibleVoice">🎧 Preview Voice</button></div>
 <div id="scriptureStatus" class="subtle" style="margin-top:10px">Loading Scripture…</div>
 <div id="scriptureChapter" class="scripture-chapter"></div>
 <div class="actions">
@@ -213,11 +214,17 @@ $('bibleVersion').onchange=()=>loadChapter();
 $('book').onchange=populateChapters;
 $('chapter').onchange=loadChapter;
 $('listenScripture').onclick=async()=>{
- try{const data=await getBook(),ch=getChapterData(data,+$('chapter').value),verses=verseArray(ch);const text=verses.map(v=>'verse '+v.verse+'. '+v.text).join(' ');speechSynthesis.cancel();const u=new SpeechSynthesisUtterance($('book').value+' chapter '+$('chapter').value+'. '+text);u.rate=.82;speechSynthesis.speak(u)}
+ try{const data=await getBook(),ch=getChapterData(data,+$('chapter').value),verses=verseArray(ch);const text=verses.map(v=>'verse '+v.verse+'. '+v.text).join(' ');speechSynthesis.cancel();const u=new SpeechSynthesisUtterance($('book').value+' chapter '+$('chapter').value+'. '+text);u.rate=.82;applyBibleVoice(u);speechSynthesis.speak(u)}
  catch(e){$('scriptureStatus').textContent='Audio could not start right now.'}
 };
 $('pauseScripture').onclick=()=>{if(speechSynthesis.speaking){speechSynthesis.paused?speechSynthesis.resume():speechSynthesis.pause()}};
 $('stopAudio').onclick=()=>speechSynthesis?.cancel();
+let bibleVoices=[];
+function refreshBibleVoices(){bibleVoices=speechSynthesis.getVoices().filter(v=>/^en(-|$)/i.test(v.lang));}
+function chooseBibleVoice(profile){refreshBibleVoices();if(!bibleVoices.length)return null;const preferred=bibleVoices.filter(v=>/female|woman|samantha|ava|victoria|karen|susan|zira|moira|allison|sara|sally|aria|jenny/i.test(v.name));const pool=preferred.length?preferred:bibleVoices;return pool[profile==='woman2'?1:profile==='woman3'?2:0]||pool[0];}
+function applyBibleVoice(u){const v=chooseBibleVoice($('bibleVoice')?.value||'woman1');if(v)u.voice=v;}
+speechSynthesis.onvoiceschanged=refreshBibleVoices;refreshBibleVoices();
+$('previewBibleVoice').onclick=()=>{const u=new SpeechSynthesisUtterance('Welcome to Scripture Daily Bread. Take a slow breath, and listen.');u.rate=.84;applyBibleVoice(u);speechSynthesis.cancel();speechSynthesis.speak(u)};
 populateBibleBooks();renderFav();
 
 const intents={family:'“And all thy children shall be taught of the Lord; and great shall be the peace of thy children.” — Isaiah 54:13',clarity:'“Trust in the Lord with all thine heart; and lean not unto thine own understanding.” — Proverbs 3:5-6',healing:'“He healeth the broken in heart, and bindeth up their wounds.” — Psalm 147:3',breakthrough:'“Is not this the fast that I have chosen? to loose the bands of wickedness…” — Isaiah 58:6'};document.querySelectorAll('.fastIntent').forEach(b=>b.onclick=()=>{$('fastVerse').textContent=intents[b.dataset.intent]});
