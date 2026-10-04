@@ -152,9 +152,10 @@ const bibleBooks=[
 ];
 let favs=load('av_favorites',[]);
 let bibleCache={};
-const bibleBase='https://raw.githubusercontent.com/midvash/bible-data/main/versions/en/';
+const bibleBase='https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/';
 const bibleSlugs={'Genesis':'Gen','Exodus':'Exod','Leviticus':'Lev','Numbers':'Num','Deuteronomy':'Deut','Joshua':'Josh','Judges':'Judg','Ruth':'Ruth','1 Samuel':'1Sam','2 Samuel':'2Sam','1 Kings':'1Kgs','2 Kings':'2Kgs','1 Chronicles':'1Chr','2 Chronicles':'2Chr','Ezra':'Ezra','Nehemiah':'Neh','Esther':'Esth','Job':'Job','Psalms':'Ps','Proverbs':'Prov','Ecclesiastes':'Eccl','Song of Solomon':'Song','Isaiah':'Isa','Jeremiah':'Jer','Lamentations':'Lam','Ezekiel':'Ezek','Daniel':'Dan','Hosea':'Hos','Joel':'Joel','Amos':'Amos','Obadiah':'Obad','Jonah':'Jonah','Micah':'Mic','Nahum':'Nah','Habakkuk':'Hab','Zephaniah':'Zeph','Haggai':'Hag','Zechariah':'Zech','Malachi':'Mal','Matthew':'Matt','Mark':'Mark','Luke':'Luke','John':'John','Acts':'Acts','Romans':'Rom','1 Corinthians':'1Cor','2 Corinthians':'2Cor','Galatians':'Gal','Ephesians':'Eph','Philippians':'Phil','Colossians':'Col','1 Thessalonians':'1Thess','2 Thessalonians':'2Thess','1 Timothy':'1Tim','2 Timothy':'2Tim','Titus':'Titus','Philemon':'Phlm','Hebrews':'Heb','James':'Jas','1 Peter':'1Pet','2 Peter':'2Pet','1 John':'1John','2 John':'2John','3 John':'3John','Jude':'Jude','Revelation':'Rev'}; function bookSlug(name){return bibleSlugs[name]||name};
-function chapterUrl(version,book){return bibleBase+version+'/books/'+encodeURIComponent(book)+'.json'};
+function bookApiSlug(name){return String(name).toLowerCase().replace(/\\s+/g,'').replace(/\\./g,'').replace(/['’]/g,'')};
+function chapterUrl(version,book,chapter){const apiVersion=version==='kjv'?'en-kjv':'en-web';return bibleBase+apiVersion+'/books/'+encodeURIComponent(bookApiSlug(book))+'/chapters/'+chapter+'.json'};
 function renderFav(){
  $('favorites').innerHTML=favs.length
  ? favs.map((x,i)=>'<li style="margin-bottom:9px"><button class="btn" data-unfav="'+i+'" title="Remove from Favorites">★</button> <strong>'+escBible(x.ref)+'</strong><br><span>'+escBible(x.text)+'</span></li>').join('')
@@ -171,7 +172,7 @@ function populateChapters(){
  $('chapter').innerHTML=Array.from({length:meta[1]},(_,i)=>'<option value="'+(i+1)+'">Chapter '+(i+1)+'</option>').join('');
  loadChapter();
 }
-async function getBook(){const version=$('bibleVersion').value,book=$('book').value,key=version+'|'+book;if(bibleCache[key])return bibleCache[key];$('scriptureStatus').textContent='Loading '+book+'…';const res=await fetch(chapterUrl(version,book));if(!res.ok)throw new Error('Scripture source unavailable');const data=await res.json();bibleCache[key]=data;return data}
+async function getBook(){const version=$('bibleVersion').value,book=$('book').value,chapter=+$('chapter').value,key=version+'|'+book+'|'+chapter;if(bibleCache[key])return bibleCache[key];$('scriptureStatus').textContent='Loading '+book+' '+chapter+'…';const res=await fetch(chapterUrl(version,book,chapter),{cache:'no-store'});if(!res.ok)throw new Error('Scripture source unavailable');const raw=await res.json();const verses=Array.isArray(raw)?raw:(Array.isArray(raw.verses)?raw.verses:(Array.isArray(raw.data?.verses)?raw.data.verses:[]));const data={chapters:{}};data.chapters[String(chapter)]={verses:verses.map(v=>({verse:Number(v.verse??v.verseNumber??v.number),text:String(v.text??v.value??'')})).filter(v=>Number.isFinite(v.verse)&&v.text)};bibleCache[key]=data;return data}
 function getChapterData(data,n){
  if(Array.isArray(data.chapters)) return data.chapters[n-1];
  if(data.chapters && data.chapters[String(n)]) return data.chapters[String(n)];
