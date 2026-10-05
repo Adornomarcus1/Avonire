@@ -213,12 +213,21 @@ $('stopReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.can
 $('listenReading').onclick=()=>{
  try{
   if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined') throw new Error('Speech synthesis unavailable');
-  const text=$('readingText').innerText.trim();
+  const parts=[...document.querySelectorAll('#readingText .reading-verse')].map(row=>{
+   const clone=row.cloneNode(true);
+   const bookmark=clone.querySelector('[data-rsave]');
+   if(bookmark) bookmark.remove();
+   return clone.textContent.replace(/\\s+/g,' ').trim();
+  }).filter(Boolean);
+  const text=parts.join(' ');
   if(!text) throw new Error('No Scripture text');
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.rate=.82;
-  if(typeof applyBibleVoice==='function') applyBibleVoice(u);
+  u.lang='en-US';
+  u.rate=.84;
+  const voices=speechSynthesis.getVoices();
+  const englishVoice=voices.find(v=>/^en(-|_)/i.test(v.lang));
+  if(englishVoice) u.voice=englishVoice;
   u.onend=()=>{};
   u.onerror=()=>{$('scriptureStatus').textContent='Audio could not start. Tap Listen once more.'};
   speechSynthesis.speak(u);
