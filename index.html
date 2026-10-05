@@ -207,23 +207,25 @@ populateBibleBooks();
 renderFav();
 $('book').onchange=populateChapters;
 $('chapter').onchange=loadChapter;
-$('openScripture').onclick=async()=>{try{const data=await getBook(),ch=getChapterData(data,+$('chapter').value),verses=verseArray(ch);if(!verses.length)throw new Error('No verses');const book=$('book').value,chapter=$('chapter').value;$('readingTitle').textContent=book+' '+chapter;$('readingMeta').textContent=$('bibleVersion').selectedOptions[0].text+' • '+verses.length+' verses';$('readingText').innerHTML=verses.map(v=>'<div class="reading-verse" id="rv-'+v.verse+'"><button class="btn" data-rsave="'+v.verse+'">'+(isSaved(book+' '+chapter+':'+v.verse)?'★':'☆')+'</button> <strong>'+v.verse+'</strong> '+escBible(v.text)+'</div>').join('');$('readingBackdrop').classList.add('open');document.querySelectorAll('[data-rsave]').forEach(b=>b.onclick=()=>{const n=+b.dataset.rsave,v=verses.find(x=>x.verse===n);toggleFavorite(book+' '+chapter+':'+n,v.text)})}catch(e){$('scriptureStatus').textContent='Scripture could not be opened right now.'}};$('listenScripture').onclick=async()=>{
+$('openScripture').onclick=async()=>{try{const data=await getBook(),ch=getChapterData(data,+$('chapter').value),verses=verseArray(ch);if(!verses.length)throw new Error('No verses');const book=$('book').value,chapter=$('chapter').value;$('readingTitle').textContent=book+' '+chapter;$('readingMeta').textContent=$('bibleVersion').selectedOptions[0].text+' • '+verses.length+' verses';$('readingText').innerHTML=verses.map(v=>'<div class="reading-verse" id="rv-'+v.verse+'"><button class="btn" data-rsave="'+v.verse+'">'+(isSaved(book+' '+chapter+':'+v.verse)?'★':'☆')+'</button> <strong>'+v.verse+'</strong> '+escBible(v.text)+'</div>').join('');$('readingBackdrop').classList.add('open');document.querySelectorAll('[data-rsave]').forEach(b=>b.onclick=()=>{const n=+b.dataset.rsave,v=verses.find(x=>x.verse===n);toggleFavorite(book+' '+chapter+':'+n,v.text)})}catch(e){$('scriptureStatus').textContent='Scripture could not be opened right now.'}};
+$('pauseReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.pause()};
+$('stopReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel()};
+$('listenReading').onclick=async()=>{
  try{
-  if(!$('readingBackdrop').classList.contains('open')) $('openScripture').click();
+  if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined') throw new Error('Speech synthesis unavailable');
   const data=await getBook(),ch=getChapterData(data,+$('chapter').value),verses=verseArray(ch);
   if(!verses.length) throw new Error('No verses');
   const book=$('book').value,chapter=$('chapter').value;
   const txt=verses.map(v=>book+' '+chapter+':'+v.verse+'. '+v.text).join(' ');
+  speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(book+' chapter '+chapter+'. '+txt);
   u.rate=.82;
   if(typeof applyBibleVoice==='function') applyBibleVoice(u);
-  speechSynthesis.cancel();
+  u.onend=()=>{};
+  u.onerror=()=>{$('scriptureStatus').textContent='Scripture audio could not start on this device.'};
   speechSynthesis.speak(u);
  }catch(e){$('scriptureStatus').textContent='Scripture audio could not start right now.'}
 };
-$('pauseReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.pause()};
-$('stopReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel()};
-$('listenReading').onclick=async()=>{try{const data=await getBook(),ch=getChapterData(data,+$('chapter').value),verses=verseArray(ch);if(!verses.length)throw new Error('No verses');const book=$('book').value,chapter=$('chapter').value;const txt=verses.map(v=>book+' '+chapter+':'+v.verse+'. '+v.text).join(' ');const u=new SpeechSynthesisUtterance(book+' chapter '+chapter+'. '+txt);u.rate=.82;if(typeof applyBibleVoice==='function')applyBibleVoice(u);speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){$('scriptureStatus').textContent='Scripture audio could not start right now.'}};
 $('closeReading').onclick=()=>{speechSynthesis.cancel();$('readingBackdrop').classList.remove('open')};
 $('goVerse').onclick=()=>{
  const n=parseInt($('findVerse').value,10);
