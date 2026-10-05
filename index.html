@@ -213,26 +213,33 @@ $('stopReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.can
 $('listenReading').onclick=()=>{
  try{
   if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined') throw new Error('Speech synthesis unavailable');
-  const parts=[...document.querySelectorAll('#readingText .reading-verse')].map(row=>{
+  const rows=[...document.querySelectorAll('#readingText .reading-verse')];
+  const text=rows.map(row=>{
    const clone=row.cloneNode(true);
    const bookmark=clone.querySelector('[data-rsave]');
    if(bookmark) bookmark.remove();
    return clone.textContent.replace(/\\s+/g,' ').trim();
-  }).filter(Boolean);
-  const text=parts.join(' ');
+  }).filter(Boolean).join(' ');
   if(!text) throw new Error('No Scripture text');
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang='en-US';
-  u.rate=.84;
+  const startSpeech=()=>{
+   speechSynthesis.cancel();
+   const u=new SpeechSynthesisUtterance(text);
+   u.lang='en-US';
+   u.rate=.84;
+   const voices=speechSynthesis.getVoices();
+   const preferred=voices.find(v=>/^en-US$/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang));
+   if(preferred) u.voice=preferred;
+   u.onerror=()=>{$('scriptureStatus').textContent='Audio could not start. Please try Listen again.'};
+   speechSynthesis.speak(u);
+  };
   const voices=speechSynthesis.getVoices();
-  const englishVoice=voices.find(v=>/^en(-|_)/i.test(v.lang));
-  if(englishVoice) u.voice=englishVoice;
-  u.onend=()=>{};
-  u.onerror=()=>{$('scriptureStatus').textContent='Audio could not start. Tap Listen once more.'};
-  speechSynthesis.speak(u);
+  if(voices.length) startSpeech();
+  else {
+   speechSynthesis.onvoiceschanged=()=>{speechSynthesis.onvoiceschanged=null;startSpeech()};
+   setTimeout(()=>{if(!speechSynthesis.speaking)startSpeech()},500);
+  }
  }catch(e){
-  $('scriptureStatus').textContent='Audio could not start. Tap Listen once more.';
+  $('scriptureStatus').textContent='Audio could not start. Please try Listen again.';
  }
 };
 $('closeReading').onclick=()=>{speechSynthesis.cancel();$('readingBackdrop').classList.remove('open')};
