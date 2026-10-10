@@ -134,11 +134,64 @@ document.querySelectorAll('[data-feeling]').forEach(b=>b.onclick=()=>{const x=fe
 
 $('sosBtn').onclick=()=>$('sosBox').classList.toggle('hidden');
 const quotes=[
-['“Your worth is not measured by the empty bottom of a laundry basket or a flawless schedule. God met you in the mess, and His grace is sufficient for this hour.”','— Matthew 11:28'],
-['“You are not failing because you are tired. You are a human being poured out for those you love. Let Him fill your cup before you pour out another drop.”','— Galatians 6:9'],
-['“The hands that hold the universe are the exact same hands holding your children, your marriage, and your tomorrow. Step back and breathe.”','— Philippians 4:6-7']];
-let qi=0;$('nextQuote').onclick=()=>{qi=(qi+1)%quotes.length;$('anchorQuote').textContent=quotes[qi][0];$('anchorVerse').textContent=quotes[qi][1]};$('laughBtn').onclick=()=>$('laughBox').classList.toggle('hidden');
-const crumbs=['“Lord, my hands are full with the kids right now, but my heart is open to You. Give me an extra measure of patience for the next hour.”','“Father, as I sit in this carpool line, I hand You my fatigue. Quiet the racing thoughts in my mind and ground me in Your peace.”','“Jesus, this work task feels dry. Remind me that I am working for Your kingdom, not for human validation.”'];let ci=0;$('nextCrumb').onclick=()=>{ci=(ci+1)%crumbs.length;$('crumb').textContent=crumbs[ci]};
+['“You do not have to do everything today. Choose the next faithful step, and let that be enough.”','— Matthew 6:34 • Reflection'],
+['“Your worth is not measured by a spotless home, a perfect schedule, or everyone else’s approval. You are loved right now.”','— Ephesians 2:10 • Reflection'],
+['“You can begin again without being ashamed of yesterday. Grace makes room for a new beginning.”','— Lamentations 3:22-23 • Reflection'],
+['“You are allowed to rest. Rest is not quitting; it is caring for the woman God made you to be.”','— Mark 6:31 • Reflection'],
+['“Small steps still move you forward. Be faithful with the little you can do today.”','— Luke 16:10 • Reflection'],
+['“You are more than the tasks on your list. Your presence, kindness, and love matter.”','— 1 Corinthians 13:4-7 • Reflection'],
+['“When the day feels too heavy, pause. You can ask for help, make a simpler plan, and start with one thing.”','— Galatians 6:2 • Reflection'],
+['“Courage does not mean you never feel afraid. It means you can take the next wise step while you feel afraid.”','— Joshua 1:9 • Reflection'],
+['“You do not need to compare your chapter with someone else’s highlight reel. Walk the path set before you.”','— Galatians 6:4-5 • Reflection'],
+['“Your voice matters. Your needs matter. You can speak honestly and kindly, including when you need support.”','— Ephesians 4:15 • Reflection'],
+['“A hard season is not the whole story. Keep making room for hope, even if today’s hope is small.”','— Romans 12:12 • Reflection'],
+['“You can be a loving woman and still have boundaries. Peace and wisdom can guide your yes and your no.”','— Proverbs 4:23 • Reflection'],
+['“You are not behind in God’s eyes because your journey looks different. Keep growing at a human pace.”','— Psalm 139:14 • Reflection'],
+['“Let today be progress, not perfection. One prayer, one task, one kind choice can be enough for this moment.”','— Colossians 3:23 • Reflection'],
+['“When you feel depleted, you do not have to pretend to be strong. Bring your honest heart to God.”','— Psalm 62:8 • Reflection'],
+['“You can learn something new, try again, and ask questions. Being a beginner is not a failure.”','— Proverbs 1:5 • Reflection'],
+['“Celebrate the quiet wins: the apology, the deep breath, the meal, the boundary, the decision to try again.”','— Zechariah 4:10 • Reflection'],
+['“You were not created to carry every burden alone. Reach for God and for trustworthy support.”','— Ecclesiastes 4:9-10 • Reflection']];
+let qi=0;$('nextQuote').onclick=()=>{qi=(qi+1)%quotes.length;$('anchorQuote').textContent=quotes[qi][0];$('anchorVerse').textContent=quotes[qi][1]};
+const jokes=[
+'“I made a to-do list, then added ‘make a to-do list’ just so I could cross something off.”',
+'“My coffee and I are practicing stillness. Mostly I’m still waiting for the coffee to kick in.”',
+'“I cleaned one room and found three things that belong in another room. The house has started a scavenger hunt.”',
+'“I told the laundry pile we need boundaries. It grew overnight.”',
+'“Today’s workout: carrying the laundry basket upstairs, then remembering the laundry is still in the washer.”',
+'“I put my phone somewhere safe. It is now so safe that neither of us can find it.”',
+'“My meal plan said ‘something simple.’ Everyone asked what that meant, including me.”',
+'“I finally sat down to relax, and immediately remembered seven things I meant to do.”',
+'“I opened the fridge for inspiration. It offered leftovers and a light bulb.”',
+'“I am multitasking: drinking coffee, praying for patience, and looking for the coffee I just set down.”',
+'“My house isn’t messy; it’s a very interactive reminder that people live here.”',
+'“I asked my family what they wanted for dinner. Apparently, I run a restaurant with no menu and no chef.”',
+'“I planned a quiet morning. The morning had other plans.”',
+'“I’m not saying my calendar is full, but even my reminders need a reminder.”',
+'“Grace for today includes forgiving myself for reheating the same cup of coffee three times.”'];
+let ji=-1;$('laughBtn').onclick=()=>{ji=(ji+1)%jokes.length;$('laughBox').textContent=jokes[ji];$('laughBox').classList.remove('hidden')};
+const crumbs=[
+'“Lord, my hands are full right now, but my heart is open to You. Give me patience for the next small step.”',
+'“Father, quiet the racing thoughts in my mind. Help me focus on what is mine to do today and release what is not.”',
+'“Jesus, meet me in this ordinary task. Help me work with love without measuring my worth by my productivity.”',
+'“God, when I feel pulled in every direction, help me pause, breathe, and choose what matters most.”',
+'“Lord, I feel stretched thin. Show me where I can simplify, ask for help, or gently say no.”',
+'“Father, bless the people I will meet today. Let my words be kind, clear, and patient.”',
+'“Jesus, help me stop comparing my life with someone else’s. Teach me to be faithful in my own season.”',
+'“Lord, I made a mistake. Give me humility to make it right and grace to learn without condemning myself.”',
+'“God, when worry takes over, remind me to bring each concern to You one at a time.”',
+'“Father, renew my strength. Help me receive rest before exhaustion makes every task feel impossible.”',
+'“Jesus, bless my home with patience and understanding. Help us listen before reacting.”',
+'“Lord, guide me through this decision. Give me wisdom, good counsel, and peace to take the next step.”',
+'“Father, help me notice one good thing in this difficult day and thank You for it.”',
+'“God, when I feel unseen, remind me that my quiet work and caring matter, even when no one applauds.”',
+'“Jesus, help me set a loving boundary without guilt and offer kindness without abandoning my own needs.”',
+'“Lord, give me courage to begin the task I have been avoiding. Let me start small instead of waiting for perfect conditions.”',
+'“Father, I am carrying sadness I cannot easily explain. Hold my heart and lead me toward comfort and wise support.”',
+'“God, bless the work of my hands today, and remind me that I am more than what I accomplish.”',
+'“Jesus, help me repair what I can, forgive where I am ready, and seek help where the hurt is too big to carry alone.”',
+'“Lord, let my home be a place where we can apologize, learn, laugh, and begin again.”'];
+let ci=0;$('nextCrumb').onclick=()=>{ci=(ci+1)%crumbs.length;$('crumb').textContent=crumbs[ci]};
 
 let seconds=120,timer=null;const renderTimer=()=>{$('timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0')};
 document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>{clearInterval(timer);seconds=+b.dataset.min*60;renderTimer();$('timerBtn').textContent='START'});$('timerBtn').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('timerBtn').textContent='RESUME'}else{timer=setInterval(()=>{if(seconds>0){seconds--;renderTimer()}else{clearInterval(timer);timer=null;$('timerBtn').textContent='FINISHED AMEN'}},1000);$('timerBtn').textContent='PAUSE'}};$('timerReset').onclick=()=>{clearInterval(timer);timer=null;seconds=120;renderTimer();$('timerBtn').textContent='START'};
