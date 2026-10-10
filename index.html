@@ -310,6 +310,98 @@ $('goVerse').onclick=()=>{
 $('readingBackdrop').addEventListener('click',e=>{if(e.target===$('readingBackdrop'))$('closeReading').click()});
 $('previewBibleVoice').onclick=()=>speak('This is a preview of your selected Bible reading voice.');
 // Removed stale handlers for pauseScripture and stopAudio IDs that are not present in the HTML.
+
+/* Core local-device features added during Avonire repair review. */
+const sanctuaryStore = {
+  get: (key, fallback) => load('av_' + key, fallback),
+  put: (key, value) => save('av_' + key, value)
+};
+function addSanctuaryItem(key, inputId, listId, emptyText) {
+  const input = $(inputId), list = $(listId);
+  if (!input || !list) return;
+  const items = sanctuaryStore.get(key, []);
+  const value = input.value.trim();
+  if (!value) { input.focus(); return; }
+  items.push({text:value, date:new Date().toISOString(), id:Date.now().toString(36)+Math.random().toString(36).slice(2,7)});
+  sanctuaryStore.put(key, items); input.value = ''; renderSanctuaryList(key,listId,emptyText);
+}
+function renderSanctuaryList(key, listId, emptyText) {
+  const list = $(listId); if (!list) return;
+  const items = sanctuaryStore.get(key, []);
+  list.innerHTML = items.length ? items.map((item,index) =>
+    '<li style="margin:7px 0">' + escBible(item.text) +
+    ' <button class="btn" type="button" data-remove-item="' + key + '" data-index="' + index + '" aria-label="Remove item">Remove</button></li>'
+  ).join('') : '<li>' + escBible(emptyText || 'Nothing saved yet.') + '</li>';
+}
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-remove-item]');
+  if (!button) return;
+  const key = button.dataset.removeItem, items = sanctuaryStore.get(key, []);
+  items.splice(Number(button.dataset.index),1); sanctuaryStore.put(key,items);
+  const config = {
+    av_food:['foodList','No items logged yet.'], av_martha:['marthaList','No tasks yet.'],
+    av_mary:['maryList','No tasks yet.'], av_blessings:['blessings','No blessings saved yet.'],
+    av_expenses:['expenses','No expenses logged yet.'], av_subs:['subs','No subscriptions saved yet.']
+  }[key];
+  if (config) renderSanctuaryList(key.replace(/^av_/,''),config[0],config[1]);
+});
+function saveFieldSet(key, ids) {
+  const value = {}; ids.forEach(id => { if ($(id)) value[id] = $(id).value; });
+  sanctuaryStore.put(key,value);
+}
+function restoreFieldSet(key, ids) {
+  const value = sanctuaryStore.get(key,{});
+  ids.forEach(id => { if ($(id) && typeof value[id] === 'string') $(id).value = value[id]; });
+}
+function downloadText(filename, text, type) {
+  const blob = new Blob([text],{type:type || 'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function startDictation(targetId) {
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recognition) { alert('Voice dictation is not supported in this browser. You can type your entry instead.'); return; }
+  const target = $(targetId); if (!target) return;
+  const recognition = new Recognition(); recognition.lang='en-US'; recognition.interimResults=false;
+  recognition.onresult = e => { target.value += (target.value ? ' ' : '') + e.results[0][0].transcript; target.focus(); };
+  recognition.onerror = () => alert('Dictation could not start. Please type your entry instead.');
+  recognition.start();
+}
+$('quietBtn').onclick=()=>{document.body.classList.toggle('night');sanctuaryStore.put('night',document.body.classList.contains('night'));};
+if (sanctuaryStore.get('night',false)) document.body.classList.add('night');
+$('sabbathBtn').onclick=()=>{document.body.classList.toggle('sabbath-active');const on=document.body.classList.contains('sabbath-active');$('sabbathBtn').textContent='Sabbath Shift: '+(on?'ON':'OFF');sanctuaryStore.put('sabbath',on);};
+if (sanctuaryStore.get('sabbath',false)) {document.body.classList.add('sabbath-active');$('sabbathBtn').textContent='Sabbath Shift: ON';}
+$('addFood').onclick=()=>addSanctuaryItem('food','foodInput','foodList','No items logged yet.');
+$('addMartha').onclick=()=>addSanctuaryItem('martha','marthaIn','marthaList','No tasks yet.');
+$('addMary').onclick=()=>addSanctuaryItem('mary','maryIn','maryList','No tasks yet.');
+$('addBlessing').onclick=()=>addSanctuaryItem('blessings','blessing','blessings','No blessings saved yet.');
+$('addSub').onclick=()=>addSanctuaryItem('subs','subName','subs','No subscriptions saved yet.');
+$('graceReset').onclick=()=>{if(confirm('Clear both task lists on this device?')){sanctuaryStore.put('martha',[]);sanctuaryStore.put('mary',[]);renderSanctuaryList('martha','marthaList','No tasks yet.');renderSanctuaryList('mary','maryList','No tasks yet.');}};
+$('dictate').onclick=()=>startDictation('voicePrayer');
+$('dreamDictate').onclick=()=>startDictation('dreamExperience');
+$('speakPrayer').onclick=()=>speak($('voicePrayer').value.trim() || 'Write a prayer first, then choose Read Text-to-Audio.');
+$('savePrayer').onclick=()=>{const text=$('voicePrayer').value.trim();if(!text){$('voicePrayer').focus();return;}const items=sanctuaryStore.get('prayers',[]);items.push({text,date:new Date().toISOString()});sanctuaryStore.put('prayers',items);alert('Prayer saved on this device.');};
+$('saveJournal').onclick=()=>{sanctuaryStore.put('journal',$('journal').value);alert('Journal saved on this device.');};
+$('readJournal').onclick=()=>speak($('journal').value.trim() || 'Your journal is empty.');
+$('exportJournal').onclick=()=>downloadText('avonire-journal.txt',$('journal').value);
+$('savePlanner').onclick=()=>{saveFieldSet('planner',['morning','midday','evening']);alert('Daily rhythm saved on this device.');};
+$('addExpense').onclick=()=>{const name=$('expenseName').value.trim(),amount=Number($('expenseCost').value);if(!name||$('expenseCost').value===''||!Number.isFinite(amount)||amount<0){alert('Enter an expense name and a valid non-negative amount.');return;}const items=sanctuaryStore.get('expenses',[]);items.push({text:name+' — 
+</body>
+</html>+amount.toFixed(2),date:new Date().toISOString()});sanctuaryStore.put('expenses',items);$('expenseName').value='';$('expenseCost').value='';renderSanctuaryList('expenses','expenses','No expenses logged yet.');};
+$('todayHistory').onclick=()=>{$('historyDate').value=new Date().toISOString().slice(0,10);$('showHistory').click();};
+$('showHistory').onclick=()=>{const date=$('historyDate').value, type=$('historyType').value;const keys=type==='all'?['journal','planner','food','prayers','blessings','expenses','dreams']:({journal:['journal'],rhythm:['planner'],fasting:['food'],prayer:['prayers'],blessing:['blessings'],expense:['expenses'],dream:['dreams']}[type]||[]);const rows=[];keys.forEach(key=>{const val=sanctuaryStore.get(key,null);if(typeof val==='string'&&val.trim()){rows.push({label:'Journal',text:val,date:'saved'});}else if(val&&typeof val==='object'&&!Array.isArray(val)){rows.push(...Object.entries(val).filter(x=>typeof x[1]==='string'&&x[1].trim()).map(x=>({label:key,text:x[1],date:'saved'})));}else if(Array.isArray(val)){val.filter(x=>!date||(x.date||'').slice(0,10)===date).forEach(x=>rows.push({label:key,text:x.text||JSON.stringify(x),date:x.date||''}));}});$('historyResults').innerHTML=rows.length?rows.map(x=>'<article class="history-item"><strong>'+escBible(x.label)+'</strong><p>'+escBible(x.text)+'</p><small>'+escBible(x.date)+'</small></article>').join(''):'<p class="subtle">No saved entries found for this date and category on this device.</p>';};
+$('exportData').onclick=()=>{const data={};for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key&&key.startsWith('av_'))data[key]=localStorage.getItem(key);}downloadText('avonire-backup.json',JSON.stringify({exportedAt:new Date().toISOString(),data},null,2),'application/json');};
+$('importDataBtn').onclick=()=>$('importData').click();
+$('importData').onchange=async event=>{const file=event.target.files&&event.target.files[0];if(!file)return;try{const backup=JSON.parse(await file.text());const data=backup.data||backup;if(!data||typeof data!=='object')throw new Error('Invalid backup');Object.entries(data).forEach(([key,value])=>{if(key.startsWith('av_')&&typeof value==='string')localStorage.setItem(key,value);});alert('Backup imported. Reload the page to refresh all sections.');}catch(e){alert('That file is not a valid Avonire backup.');}finally{event.target.value='';}};
+$('addPrayer').onclick=()=>{const title=$('prayerTitle').value.trim(),text=$('prayerText').value.trim();if(!title||!text){alert('Enter a prayer title and what you are praying for.');return;}const items=sanctuaryStore.get('prayers',[]);items.push({text:title+': '+text,date:new Date().toISOString(),started:$('prayerStarted').value,status:'Ongoing'});sanctuaryStore.put('prayers',items);$('prayerTitle').value='';$('prayerText').value='';$('prayerList').innerHTML=items.map(x=>'<div class="prayer-entry"><strong>'+escBible(x.text)+'</strong><p class="subtle">Started: '+escBible(x.started||'Not specified')+' • '+escBible(x.status)+'</p></div>').join('');};
+$('saveDream').onclick=()=>{const experience=$('dreamExperience').value.trim();if(!experience){$('dreamExperience').focus();return;}const items=sanctuaryStore.get('dreams',[]);items.push({text:experience,date:($('dreamDate').value||new Date().toISOString().slice(0,10))+'T12:00:00.000Z',kind:$('dreamKind').value,meaning:$('dreamMeaning').value,prayer:$('dreamPrayer').value});sanctuaryStore.put('dreams',items);$('dreamExperience').value='';$('dreamMeaning').value='';$('dreamPrayer').value='';$('dreamList').innerHTML=items.map(x=>'<div class="prayer-entry"><strong>'+escBible(x.kind||'Reflection')+'</strong><p>'+escBible(x.text)+'</p><small>'+escBible(x.date.slice(0,10))+'</small></div>').join('');};
+const sabbathInvitations=['Have your coffee and sit quietly with God.','Take three slow breaths and release one burden in prayer.','Read one verse slowly; there is no need to rush.','Let one nonessential task wait while you rest.','Thank God for one small kindness you noticed today.'];
+let sabbathIndex=0;$('nextSabbath').onclick=()=>{sabbathIndex=(sabbathIndex+1)%sabbathInvitations.length;$('sabbathSuggestion').textContent=sabbathInvitations[sabbathIndex];};
+['food','martha','mary','blessings','expenses','subs'].forEach(key=>{const cfg={food:['foodList','No items logged yet.'],martha:['marthaList','No tasks yet.'],mary:['maryList','No tasks yet.'],blessings:['blessings','No blessings saved yet.'],expenses:['expenses','No expenses logged yet.'],subs:['subs','No subscriptions saved yet.']}[key];renderSanctuaryList(key,cfg[0],cfg[1]);});
+restoreFieldSet('planner',['morning','midday','evening']);
+$('journal').value=sanctuaryStore.get('journal','');
+
 </script>
 </body>
 </html>
