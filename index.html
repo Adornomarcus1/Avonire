@@ -124,7 +124,7 @@
 const $=id=>document.getElementById(id);
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
-const speak=text=>{if(!('speechSynthesis'in window))return; speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.86;speechSynthesis.speak(u)};
+const speak=text=>{if(!('speechSynthesis'in window)||typeof SpeechSynthesisUtterance==='undefined'){alert('Audio playback is not available in this browser.');return;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(text||''));u.rate=.86;speechSynthesis.speak(u)};
 
 const feelings={
 overwhelmed:['“Come unto me, all ye that labour and are heavy laden, and I will give you rest.” — Matthew 11:28','You do not have to carry this hour alone. Receive grace for the next small step.'],
@@ -134,7 +134,8 @@ pain:['“I am a woman of a sorrowful spirit… but have poured out my soul befo
 };
 document.querySelectorAll('[data-feeling]').forEach(b=>b.onclick=()=>{const x=feelings[b.dataset.feeling];$('feelingResponse').classList.remove('hidden');$('feelingVerse').textContent=x[0];$('feelingReminder').textContent=x[1];document.querySelectorAll('[data-feeling]').forEach(c=>c.classList.remove('active'));b.classList.add('active');$('speakFeeling').onclick=()=>speak(x[0]+' '+x[1])});
 
-$('sosBtn').onclick=()=>$('sosBox').classList.toggle('hidden');
+$('sosBtn').onclick=()=>{$('sosBox').classList.toggle('hidden');if(!$('sosBox').classList.contains('hidden'))$('sosBox').setAttribute('tabindex','-1');};
+$('soulMessage').textContent=['You can arrive exactly as you are. There is room for your tired heart here.','You do not have to solve the whole day at once. Begin with one breath and one prayer.','God can meet you in the ordinary moments, right in the middle of real life.'][new Date().getDate()%3];
 const quotes=[
 ['“You do not have to do everything today. Choose the next faithful step, and let that be enough.”','— Matthew 6:34 • Reflection'],
 ['“Your worth is not measured by a spotless home, a perfect schedule, or everyone else’s approval. You are loved right now.”','— Ephesians 2:10 • Reflection'],
@@ -171,6 +172,7 @@ const jokes=[
 '“I planned a quiet morning. The morning had other plans.”',
 '“I’m not saying my calendar is full, but even my reminders need a reminder.”',
 '“Grace for today includes forgiving myself for reheating the same cup of coffee three times.”'];
+jokes.unshift('“My house is clean, my children are quiet, laundry is completely folded away, and dinner is perfectly cooked… then I woke up from my afternoon nap.”');
 let ji=-1;$('laughBtn').onclick=()=>{ji=(ji+1)%jokes.length;$('laughBox').textContent=jokes[ji];$('laughBox').classList.remove('hidden')};
 const crumbs=[
 '“Lord, my hands are full right now, but my heart is open to You. Give me patience for the next small step.”',
@@ -272,36 +274,38 @@ $('openScripture').onclick=async()=>{try{
  $('readingBackdrop').classList.add('open');
  document.querySelectorAll('[data-rsave]').forEach(b=>b.onclick=()=>{const n=+b.dataset.rsave,v=verses.find(x=>x.verse===n);toggleFavorite(book+' '+chapter+':'+n,v.text)});
 }catch(e){$('scriptureStatus').textContent='Scripture could not be opened right now.'}};
+let readingQueue=[],readingIndex=0;
+function selectedBibleVoice(){
+ const voices=speechSynthesis.getVoices(),english=voices.filter(v=>/^en(-|$)/i.test(v.lang));
+ const femaleHint=/(female|woman|samantha|victoria|karen|zira|aria|jenny|susan|hazel|libby|sonia|tessa|moira|fiona|ava|allison|siri)/i;
+ const choice=$('bibleVoice').value;
+ let preferred;
+ if(choice==='woman1') preferred=english.find(v=>femaleHint.test(v.name)&&/(calm|natural|enhanced|premium)/i.test(v.name))||english.find(v=>femaleHint.test(v.name));
+ if(choice==='woman2') preferred=english.find(v=>femaleHint.test(v.name)&&/(warm|natural|premium|neural|enhanced)/i.test(v.name))||english.find(v=>femaleHint.test(v.name));
+ if(choice==='woman3') preferred=english.find(v=>femaleHint.test(v.name)&&/^en-US$/i.test(v.lang))||english.find(v=>femaleHint.test(v.name));
+ return preferred||english.find(v=>/^en-US$/i.test(v.lang))||english[0]||null;
+}
+function speakNextBibleVerse(){
+ if(readingIndex>=readingQueue.length){$('scriptureStatus').textContent='Finished reading Scripture.';return;}
+ const u=new SpeechSynthesisUtterance(readingQueue[readingIndex]);
+ u.lang='en-US';u.rate=.84;
+ const voice=selectedBibleVoice();if(voice)u.voice=voice;
+ u.onstart=()=>{$('scriptureStatus').textContent='Reading Scripture aloud… ('+(readingIndex+1)+' of '+readingQueue.length+')';};
+ u.onend=()=>{readingIndex++;speakNextBibleVerse();};
+ u.onerror=e=>{if(e.error!=='canceled'&&e.error!=='interrupted')$('scriptureStatus').textContent='Audio paused or unavailable. Press Listen to try again.';};
+ speechSynthesis.speak(u);
+}
 $('pauseReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.pause()};
-$('stopReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel()};
+$('stopReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel();readingQueue=[];readingIndex=0;$('scriptureStatus').textContent='Reading stopped.'};
 $('listenReading').onclick=()=>{
  try{
   if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined')throw new Error('Speech synthesis unavailable');
   const rows=[...document.querySelectorAll('#readingText .reading-verse')];
-  const text=rows.map(row=>{
-   const speech=row.querySelector('.verse-speech');
-   const num=row.querySelector('strong');
-   return (num?num.textContent.trim()+' ':'')+(speech?speech.textContent.trim():'');
-  }).filter(Boolean).join(' ');
-  if(!text)throw new Error('No Scripture text');
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang='en-US';u.rate=.84;
-  const voiceChoice=$('bibleVoice').value;
-  const voices=speechSynthesis.getVoices();
-  const english=voices.filter(v=>/^en(-|$)/i.test(v.lang));
-  const femaleHint=/(female|woman|samantha|victoria|karen|zira|aria|jenny|susan|hazel|libby|sonia|tessa|moira|fiona)/i;
-  const warmHint=/(warm|natural|premium|neural|enhanced)/i;
-  let preferred;
-  if(voiceChoice==='woman1') preferred=english.find(v=>femaleHint.test(v.name)&&warmHint.test(v.name));
-  if(voiceChoice==='woman2') preferred=english.find(v=>femaleHint.test(v.name)&&warmHint.test(v.name))||english.find(v=>femaleHint.test(v.name));
-  if(voiceChoice==='woman3') preferred=english.find(v=>femaleHint.test(v.name)&&/^en-US$/i.test(v.lang))||english.find(v=>femaleHint.test(v.name));
-  preferred=preferred||english.find(v=>/^en-US$/i.test(v.lang))||english[0];
-  if(preferred)u.voice=preferred;
-  u.onerror=()=>{$('scriptureStatus').textContent='Audio could not start. Please try Listen again.'};
-  u.onstart=()=>{$('scriptureStatus').textContent='Reading Scripture aloud…'};
-  u.onend=()=>{$('scriptureStatus').textContent='Finished reading Scripture.'};
-  speechSynthesis.speak(u);
+  readingQueue=rows.map(row=>{const speech=row.querySelector('.verse-speech');const num=row.querySelector('strong');return (num?num.textContent.trim()+'. ':'')+(speech?speech.textContent.trim():'');}).filter(Boolean);
+  if(!readingQueue.length)throw new Error('No Scripture text');
+  speechSynthesis.cancel();readingIndex=0;
+  if(speechSynthesis.getVoices().length){speakNextBibleVerse();}
+  else {speechSynthesis.onvoiceschanged=()=>{speechSynthesis.onvoiceschanged=null;speakNextBibleVerse();};window.setTimeout(()=>{if(readingIndex===0&&speechSynthesis.speaking===false&&speechSynthesis.pending===false&&speechSynthesis.getVoices().length===0)speakNextBibleVerse();},350);}
  }catch(e){$('scriptureStatus').textContent='Audio could not start. Please try Listen again.'}
 };
 $('closeReading').onclick=()=>{speechSynthesis.cancel();$('readingBackdrop').classList.remove('open')};
@@ -310,7 +314,7 @@ $('goVerse').onclick=()=>{
  if(Number.isFinite(n)){const el=$('rv-'+n);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})}
 };
 $('readingBackdrop').addEventListener('click',e=>{if(e.target===$('readingBackdrop'))$('closeReading').click()});
-$('previewBibleVoice').onclick=()=>speak('This is a preview of your selected Bible reading voice.');
+$('previewBibleVoice').onclick=()=>{if(!('speechSynthesis'in window)||typeof SpeechSynthesisUtterance==='undefined'){alert('Audio preview is not available in this browser.');return;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance('Welcome to Scripture Daily Bread. Take a slow breath, and let us read together.');u.lang='en-US';u.rate=.84;const voice=selectedBibleVoice();if(voice)u.voice=voice;speechSynthesis.speak(u);};
 // Removed stale handlers for pauseScripture and stopAudio IDs that are not present in the HTML.
 
 /* Core local-device features added during Avonire repair review. */
@@ -374,6 +378,27 @@ $('quietBtn').onclick=()=>{document.body.classList.toggle('night');sanctuaryStor
 if (sanctuaryStore.get('night',false)) document.body.classList.add('night');
 $('sabbathBtn').onclick=()=>{document.body.classList.toggle('sabbath-active');const on=document.body.classList.contains('sabbath-active');$('sabbathBtn').textContent='Sabbath Shift: '+(on?'ON':'OFF');sanctuaryStore.put('sabbath',on);};
 if (sanctuaryStore.get('sabbath',false)) {document.body.classList.add('sabbath-active');$('sabbathBtn').textContent='Sabbath Shift: ON';}
+const fastIntentions={
+ family:['“As for me and my house, we will serve the Lord.” — Joshua 24:15','Pray for your family with honesty and love. Fasting is optional; choose a safe practice that suits your health.'],
+ clarity:['“If any of you lack wisdom, let him ask of God.” — James 1:5','Make room for prayer, wise counsel, and a clear next step rather than pressure to force an answer.'],
+ healing:['“He healeth the broken in heart, and bindeth up their wounds.” — Psalm 147:3','Bring your need to God and seek appropriate support. A fast is not a substitute for medical care.'],
+ breakthrough:['“Be strong and of a good courage… for the Lord thy God is with thee.” — Joshua 1:9','Ask for courage and practical help for the next faithful step.']
+};
+const fastGuides={
+ water:'Water Only: this is a spiritual reflection space, not medical guidance. Do not undertake a water-only fast without professional advice; avoid fasting if it may be unsafe for you.',
+ daniel:'Daniel-style: consider a simple food-focused practice if appropriate for you. Keep it nourishing and adapt it to your needs; consult a clinician if you have health concerns.',
+ intermittent:'Intermittent: fasting windows are not suitable for everyone. Do not fast without medical guidance if pregnant, managing a condition, taking medicines affected by food, or with a history of disordered eating.',
+ digital:'Digital: take a break from an app, scrolling, or entertainment and use the time for prayer, rest, or connection. No food restriction is required.'
+};
+document.querySelectorAll('.fastIntent').forEach(button=>button.onclick=()=>{
+ const item=fastIntentions[button.dataset.intent];if(!item)return;
+ $('fastVerse').innerHTML='<strong>'+escBible(item[0])+'</strong><p>'+escBible(item[1])+'</p>';
+ document.querySelectorAll('.fastIntent').forEach(b=>b.classList.toggle('active',b===button));
+});
+document.querySelectorAll('.fastType').forEach(button=>button.onclick=()=>{
+ $('fastGuide').textContent=fastGuides[button.dataset.type]||'Choose a gentle practice that is safe for you.';
+ document.querySelectorAll('.fastType').forEach(b=>b.classList.toggle('active',b===button));
+});
 $('addFood').onclick=()=>addSanctuaryItem('food','foodInput','foodList','No items logged yet.');
 $('addMartha').onclick=()=>addSanctuaryItem('martha','marthaIn','marthaList','No tasks yet.');
 $('addMary').onclick=()=>addSanctuaryItem('mary','maryIn','maryList','No tasks yet.');
@@ -399,6 +424,18 @@ $('saveDream').onclick=()=>{const experience=$('dreamExperience').value.trim();i
 const sabbathInvitations=['Have your coffee and sit quietly with God.','Take three slow breaths and release one burden in prayer.','Read one verse slowly; there is no need to rush.','Let one nonessential task wait while you rest.','Thank God for one small kindness you noticed today.'];
 let sabbathIndex=0;$('nextSabbath').onclick=()=>{sabbathIndex=(sabbathIndex+1)%sabbathInvitations.length;$('sabbathSuggestion').textContent=sabbathInvitations[sabbathIndex];};
 ['food','martha','mary','blessings','expenses','subs'].forEach(key=>{const cfg={food:['foodList','No items logged yet.'],martha:['marthaList','No tasks yet.'],mary:['maryList','No tasks yet.'],blessings:['blessings','No blessings saved yet.'],expenses:['expenses','No expenses logged yet.'],subs:['subs','No subscriptions saved yet.']}[key];renderSanctuaryList(key,cfg[0],cfg[1]);});
+function renderBookTracker(){
+ const names=bibleBooks.map(item=>item[0]),read=new Set(sanctuaryStore.get('booksRead',[]));
+ $('books').innerHTML=names.map(name=>'<button type="button" class="book '+(read.has(name)?'read':'')+'" data-book-read="'+escBible(name)+'" aria-pressed="'+read.has(name)+'">'+escBible(name)+'</button>').join('');
+ $('progress').textContent=read.size+'/66 Completed';
+ $('shelf').textContent=read.size?[...read].join(' • '):'Your library shelf is empty. Mark a book below to place it here.';
+ $('books').querySelectorAll('[data-book-read]').forEach(button=>button.onclick=()=>{
+  const name=button.dataset.bookRead,updated=new Set(sanctuaryStore.get('booksRead',[]));
+  if(updated.has(name))updated.delete(name);else updated.add(name);
+  sanctuaryStore.put('booksRead',[...updated]);renderBookTracker();
+ });
+}
+renderBookTracker();
 restoreFieldSet('planner',['morning','midday','evening']);
 $('journal').value=sanctuaryStore.get('journal','');
 
