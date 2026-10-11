@@ -198,7 +198,7 @@ const crumbs=[
 let ci=0;$('nextCrumb').onclick=()=>{ci=(ci+1)%crumbs.length;$('crumb').textContent=crumbs[ci]};
 
 let seconds=120,timer=null;const renderTimer=()=>{$('timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0')};
-document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>{clearInterval(timer);seconds=+b.dataset.min*60;renderTimer();$('timerBtn').textContent='START'});$('timerBtn').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('timerBtn').textContent='RESUME'}else{timer=setInterval(()=>{if(seconds>0){seconds--;renderTimer()}else{clearInterval(timer);timer=null;$('timerBtn').textContent='FINISHED AMEN'}},1000);$('timerBtn').textContent='PAUSE'}};$('timerReset').onclick=()=>{clearInterval(timer);timer=null;seconds=120;renderTimer();$('timerBtn').textContent='START'};
+document.querySelectorAll('[data-min]').forEach(b=>b.onclick=()=>{clearInterval(timer);timer=null;seconds=+b.dataset.min*60;renderTimer();$('timerBtn').textContent='START'});$('timerBtn').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('timerBtn').textContent='RESUME'}else{timer=setInterval(()=>{if(seconds>0){seconds--;renderTimer()}else{clearInterval(timer);timer=null;$('timerBtn').textContent='FINISHED AMEN'}},1000);$('timerBtn').textContent='PAUSE'}};$('timerReset').onclick=()=>{clearInterval(timer);timer=null;seconds=120;renderTimer();$('timerBtn').textContent='START'};
 
 const bibleBooks=[
 ['Genesis',50],['Exodus',40],['Leviticus',27],['Numbers',36],['Deuteronomy',34],['Joshua',24],['Judges',21],['Ruth',4],
@@ -295,8 +295,8 @@ function speakNextBibleVerse(){
  u.onerror=e=>{if(e.error!=='canceled'&&e.error!=='interrupted')$('scriptureStatus').textContent='Audio paused or unavailable. Press Listen to try again.';};
  speechSynthesis.speak(u);
 }
-$('pauseReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.pause()};
-$('stopReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel();readingQueue=[];readingIndex=0;$('scriptureStatus').textContent='Reading stopped.'};
+$('pauseReading').onclick=()=>{if(!('speechSynthesis' in window))return;if(speechSynthesis.paused){speechSynthesis.resume();$('pauseReading').textContent='⏸ Pause';}else{speechSynthesis.pause();$('pauseReading').textContent='▶ Resume';}};
+$('stopReading').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel();readingQueue=[];readingIndex=0;$('pauseReading').textContent='⏸ Pause';$('scriptureStatus').textContent='Reading stopped.'};
 $('listenReading').onclick=()=>{
  try{
   if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined')throw new Error('Speech synthesis unavailable');
@@ -305,10 +305,10 @@ $('listenReading').onclick=()=>{
   if(!readingQueue.length)throw new Error('No Scripture text');
   speechSynthesis.cancel();readingIndex=0;
   if(speechSynthesis.getVoices().length){speakNextBibleVerse();}
-  else {speechSynthesis.onvoiceschanged=()=>{speechSynthesis.onvoiceschanged=null;speakNextBibleVerse();};window.setTimeout(()=>{if(readingIndex===0&&speechSynthesis.speaking===false&&speechSynthesis.pending===false&&speechSynthesis.getVoices().length===0)speakNextBibleVerse();},350);}
+  else {let started=false;const begin=()=>{if(started)return;started=true;speechSynthesis.onvoiceschanged=null;speakNextBibleVerse();};speechSynthesis.onvoiceschanged=begin;window.setTimeout(begin,350);}
  }catch(e){$('scriptureStatus').textContent='Audio could not start. Please try Listen again.'}
 };
-$('closeReading').onclick=()=>{speechSynthesis.cancel();$('readingBackdrop').classList.remove('open')};
+$('closeReading').onclick=()=>{speechSynthesis.cancel();readingQueue=[];readingIndex=0;$('pauseReading').textContent='⏸ Pause';$('readingBackdrop').classList.remove('open')};
 $('goVerse').onclick=()=>{
  const n=parseInt($('findVerse').value,10);
  if(Number.isFinite(n)){const el=$('rv-'+n);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})}
@@ -376,8 +376,9 @@ function startDictation(targetId) {
 }
 $('quietBtn').onclick=()=>{document.body.classList.toggle('night');sanctuaryStore.put('night',document.body.classList.contains('night'));};
 if (sanctuaryStore.get('night',false)) document.body.classList.add('night');
-$('sabbathBtn').onclick=()=>{document.body.classList.toggle('sabbath-active');const on=document.body.classList.contains('sabbath-active');$('sabbathBtn').textContent='Sabbath Shift: '+(on?'ON':'OFF');sanctuaryStore.put('sabbath',on);};
-if (sanctuaryStore.get('sabbath',false)) {document.body.classList.add('sabbath-active');$('sabbathBtn').textContent='Sabbath Shift: ON';}
+function applySabbathState(on){document.body.classList.toggle('sabbath-active',on);$('sabbathBtn').textContent='Sabbath Shift: '+(on?'ON':'OFF');$('marthaIn').disabled=on;$('addMartha').disabled=on;$('marthaIn').setAttribute('aria-disabled',String(on));$('addMartha').setAttribute('aria-disabled',String(on));$('sabbathBtn').setAttribute('aria-pressed',String(on));}
+$('sabbathBtn').onclick=()=>{const on=!document.body.classList.contains('sabbath-active');applySabbathState(on);sanctuaryStore.put('sabbath',on);};
+applySabbathState(!!sanctuaryStore.get('sabbath',false));
 const fastIntentions={
  family:['“As for me and my house, we will serve the Lord.” — Joshua 24:15','Pray for your family with honesty and love. Fasting is optional; choose a safe practice that suits your health.'],
  clarity:['“If any of you lack wisdom, let him ask of God.” — James 1:5','Make room for prayer, wise counsel, and a clear next step rather than pressure to force an answer.'],
